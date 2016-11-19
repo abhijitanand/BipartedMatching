@@ -13,7 +13,7 @@ public class BipartedGraphGeneration {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		String bipFile = "C:\\data\\bitbucket\\AbBitBucket\\WeightedGraphMatching\\data\\bipartedFile.csv";
+		String bipFile = ".\\data\\bipartedFile.csv";
 		int numNodes =200;
 		BipartedGraphGeneration bG = new BipartedGraphGeneration();
 		bG.generateCompleteWeightedBipartedGraph(bipFile, numNodes);
