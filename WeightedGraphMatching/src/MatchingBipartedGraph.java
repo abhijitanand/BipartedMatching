@@ -3,7 +3,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +13,9 @@ public class MatchingBipartedGraph {
 	Map<Integer, Integer> MapVLabel = new HashMap<Integer, Integer>();
 	Map<Integer, Map<Integer, Integer>> MapUVValue = new HashMap<Integer, Map<Integer, Integer>>();
 	Map<Integer, Integer> VUMatching = new HashMap<Integer, Integer>();
+	Set<Integer> U = new HashSet<Integer>();
 	int max = 0;
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String filename = ".\\data\\bipartedFile.csv";
@@ -24,7 +28,7 @@ public class MatchingBipartedGraph {
 			Map<Integer, Map<Integer, Integer>> MapUVValue) {
 		String line = "";
 		BufferedReader br = null;
-		int  min = 0;
+		int min = 0;
 		int localMax = 0, localMin = 0;
 		try {
 			br = new BufferedReader(new FileReader(filename));
@@ -64,47 +68,46 @@ public class MatchingBipartedGraph {
 		}
 	}
 
-	void getMatchForNode(int u) {
+	boolean getMatchForNode(int u) {
 		Map.Entry<Integer, Integer> minEntry = null;
 		int oldKey = 0;
 		int oldU = 0;
 		boolean bFlag = false;
-		if(MapUVValue.containsKey(u))
-		{
-			System.out.println(u);
-			for (Map.Entry<Integer, Integer> entry : MapUVValue.get(u).entrySet()) {
+		if (MapUVValue.containsKey(u) && !U.contains(u)) {
+			//System.out.println(u+":");
+			for (Map.Entry<Integer, Integer> entry : MapUVValue.get(u)
+					.entrySet()) {
 				if (MapVLabel.get(entry.getKey()) > 0) {
 					oldKey = entry.getKey();
 					entry.setValue(MapVLabel.get(oldKey) + entry.getValue());
 				}
-				if ((minEntry == null || entry.getValue() < minEntry.getValue())&& entry.getValue()< max) {
+				if ((minEntry == null || entry.getValue() < minEntry.getValue())
+						&& entry.getValue() < max) {
 					minEntry = entry;
 				}
 			}
-			if(minEntry !=null)
-			{
+			if (minEntry != null) {
 				int v = minEntry.getKey();
 				int minValue = minEntry.getValue();
-				MapVLabel.put(v, minValue);	
-					if (VUMatching.containsKey(v)) {
-						bFlag = true;
-						oldU = VUMatching.get(v);
-					}
-					VUMatching.remove(v);
-					VUMatching.put(v, u);		
+				MapVLabel.put(v, minValue);
+				if (VUMatching.containsKey(v)) {
+					bFlag = true;
+					oldU = VUMatching.get(v);
+					U.remove(oldU);
+				}
+				VUMatching.remove(v);
+				VUMatching.put(v, u);
+				U.add(u);
 				while (bFlag) {
-					getMatchForNode(oldU);
+					bFlag = getMatchForNode(oldU);
 				}
 			}
-			
 
+		} else {
+			return false;
 		}
-		else
-		{
-			System.out.println(u);
-		}
-		
-			}
+		return true;
+	}
 
 	void matchBipartedWeightedGraph(String filename) {
 
@@ -115,15 +118,17 @@ public class MatchingBipartedGraph {
 			int u = pairs.getKey();
 			getMatchForNode(u);
 		}
-		for (Map.Entry<Integer, Integer> pairs : VUMatching
-				.entrySet()) {
-			System.out.println(pairs.getKey()+":"+pairs.getValue());
+		for (Map.Entry<Integer, Integer> pairs : VUMatching.entrySet()) {
+			System.out.println(pairs.getKey() + ":" + pairs.getValue());
 		}
 		int minValue = 0;
-		for (Map.Entry<Integer, Integer> pairs : MapVLabel
-				.entrySet()) {
+		for (Map.Entry<Integer, Integer> pairs : MapVLabel.entrySet()) {
 			minValue = minValue + pairs.getValue();
 		}
-		System.out.println("Min Value:"+minValue);
+		System.out.println("Min Value:" + minValue);
+		for(Map.Entry<Integer, Integer>pairs : MapVLabel.entrySet())
+		{
+			System.out.println(pairs.getKey()+";"+pairs.getValue());
+		}
 	}
 }
