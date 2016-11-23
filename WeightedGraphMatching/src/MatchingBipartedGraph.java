@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -15,6 +16,7 @@ public class MatchingBipartedGraph {
 	Map<Integer, Integer> VUMatching = new HashMap<Integer, Integer>();
 	Set<Integer> U = new HashSet<Integer>();
 	int max = 0;
+	int minWeight =0;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -58,6 +60,8 @@ public class MatchingBipartedGraph {
 					localMin = value;
 				}
 			}
+			max = max + localMax;
+			min = min + localMin;
 			System.out.println("Max:" + max + "Min:" + min);
 		} catch (FileNotFoundException ex) {
 			Logger.getLogger(MatchingBipartedGraph.class.getName()).log(
@@ -70,8 +74,9 @@ public class MatchingBipartedGraph {
 
 	boolean getMatchForNode(int u) {
 		Map.Entry<Integer, Integer> minEntry = null;
+		Map.Entry<Integer, Integer> oldminEntry = null;
 		int oldKey = 0;
-		int oldU = 0;
+		int oldU = 0;		
 		boolean bFlag = false;
 		if (MapUVValue.containsKey(u) && !U.contains(u)) {
 			//System.out.println(u+":");
@@ -83,12 +88,21 @@ public class MatchingBipartedGraph {
 				}
 				if ((minEntry == null || entry.getValue() < minEntry.getValue())
 						&& entry.getValue() < max) {
+					oldminEntry = minEntry;
 					minEntry = entry;
 				}
 			}
 			if (minEntry != null) {
 				int v = minEntry.getKey();
-				int minValue = minEntry.getValue();
+				int minValue =0;
+				if(oldminEntry !=null)
+				{
+					minValue = oldminEntry.getValue();
+				}
+				else
+				{
+					minValue = minEntry.getValue();
+				}				
 				MapVLabel.put(v, minValue);
 				if (VUMatching.containsKey(v)) {
 					bFlag = true;
@@ -118,17 +132,16 @@ public class MatchingBipartedGraph {
 			int u = pairs.getKey();
 			getMatchForNode(u);
 		}
-		for (Map.Entry<Integer, Integer> pairs : VUMatching.entrySet()) {
-			System.out.println(pairs.getKey() + ":" + pairs.getValue());
-		}
 		int minValue = 0;
-		for (Map.Entry<Integer, Integer> pairs : MapVLabel.entrySet()) {
+		for (Map.Entry<Integer, Integer> pairs : VUMatching.entrySet()) {
+			int value = MapUVValue.get(pairs.getValue()).get(pairs.getKey());
+			System.out.println(pairs.getValue() + ":" + pairs.getKey()+";"+value);
+			minValue = minValue + value;
+		}
+		
+		/*for (Map.Entry<Integer, Integer> pairs : MapVLabel.entrySet()) {
 			minValue = minValue + pairs.getValue();
-		}
+		}*/
 		System.out.println("Min Value:" + minValue);
-		for(Map.Entry<Integer, Integer>pairs : MapVLabel.entrySet())
-		{
-			System.out.println(pairs.getKey()+";"+pairs.getValue());
-		}
 	}
 }

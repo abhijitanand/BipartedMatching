@@ -57,7 +57,7 @@ public class HungarianAlgorithm {
   private final boolean[] committedWorkers;
 	public static void main(String[] args) {
 
-		String filename = ".\\data\\bipartedFile.csv";
+		String filename = ".\\data\\bipartedFile1.csv";
 		MatrixForHungarianAlgorithm matrix = new MatrixForHungarianAlgorithm();
 		costMatrix = matrix.generateCostMatrix(filename);
 		HungarianAlgorithm hung = new HungarianAlgorithm(costMatrix);
